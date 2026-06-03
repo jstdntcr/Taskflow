@@ -13,8 +13,22 @@ export async function getProfile(userId: string): Promise<Profile | null> {
 }
 
 export async function upsertProfile(updates: Partial<Profile> & { id: string }): Promise<void> {
-  const { error } = await supabase.from('profiles').upsert(updates);
-  if (error) throw new Error(error.message);
+  // Try UPDATE first (profile should exist — created by signup trigger)
+  const { error: updateError, count } = await supabase
+    .from('profiles')
+    .update(updates)
+    .eq('id', updates.id)
+    .select('id', { count: 'exact', head: true });
+
+  if (updateError) throw new Error(updateError.message);
+
+  // No row matched — profile missing, insert it
+  if (count === 0) {
+    const { error: insertError } = await supabase
+      .from('profiles')
+      .insert(updates);
+    if (insertError) throw new Error(insertError.message);
+  }
 }
 
 export async function uploadAvatar(userId: string, file: File): Promise<string> {

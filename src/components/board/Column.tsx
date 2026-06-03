@@ -25,6 +25,7 @@ export function Column({ column, tasks, boardId, onTaskClick }: Props) {
   const [renameValue, setRenameValue] = useState(column.title);
   const [addingTask, setAddingTask] = useState(false);
   const [taskTitle, setTaskTitle] = useState('');
+  const [taskError, setTaskError] = useState<string | null>(null);
 
   const sorted = [...tasks].sort((a, b) => a.position - b.position);
 
@@ -53,9 +54,14 @@ export function Column({ column, tasks, boardId, onTaskClick }: Props) {
     e?.preventDefault();
     const trimmed = taskTitle.trim();
     if (!trimmed) return;
-    await createTask.mutateAsync({ columnId: column.id, title: trimmed, position: sorted.length });
-    setTaskTitle('');
-    setAddingTask(false);
+    setTaskError(null);
+    try {
+      await createTask.mutateAsync({ columnId: column.id, title: trimmed, position: sorted.length });
+      setTaskTitle('');
+      setAddingTask(false);
+    } catch (err) {
+      setTaskError(err instanceof Error ? err.message : 'Не удалось создать задачу');
+    }
   };
 
   const onTaskKey = (e: KeyboardEvent<HTMLTextAreaElement>) => {
@@ -105,17 +111,18 @@ export function Column({ column, tasks, boardId, onTaskClick }: Props) {
             <textarea
               autoFocus
               value={taskTitle}
-              onChange={(e) => setTaskTitle(e.target.value)}
+              onChange={(e) => { setTaskTitle(e.target.value); setTaskError(null); }}
               onKeyDown={onTaskKey}
               placeholder="Название задачи..."
               rows={2}
               className={styles.taskInput}
             />
+            {taskError && <p className={styles.taskError}>{taskError}</p>}
             <div className={styles.addActions}>
               <button type="submit" disabled={!taskTitle.trim() || createTask.isPending} className={styles.saveBtn}>
-                Добавить
+                {createTask.isPending ? 'Сохраняем...' : 'Добавить'}
               </button>
-              <button type="button" onClick={() => { setAddingTask(false); setTaskTitle(''); }} className={styles.cancelBtn}>
+              <button type="button" onClick={() => { setAddingTask(false); setTaskTitle(''); setTaskError(null); }} className={styles.cancelBtn}>
                 Отмена
               </button>
             </div>

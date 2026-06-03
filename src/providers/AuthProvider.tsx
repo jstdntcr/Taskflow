@@ -13,6 +13,14 @@ interface AuthContextValue {
 
 const AuthContext = createContext<AuthContextValue | null>(null);
 
+// Sets email as default display name if profile has no name yet
+async function ensureProfile(userId: string, email: string) {
+  await supabase.from('profiles').upsert(
+    { id: userId, name: email },
+    { onConflict: 'id', ignoreDuplicates: true }
+  );
+}
+
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
@@ -23,11 +31,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setSession(session);
       setUser(session?.user ?? null);
       setLoading(false);
+      if (session?.user) ensureProfile(session.user.id, session.user.email ?? '');
     });
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
       setUser(session?.user ?? null);
+      if (session?.user) ensureProfile(session.user.id, session.user.email ?? '');
     });
 
     return () => subscription.unsubscribe();

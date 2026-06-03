@@ -2,13 +2,18 @@ import { supabase } from './supabase';
 import type { Task } from '../types';
 
 export async function getTasks(boardId: string): Promise<Task[]> {
+  const { data: columns, error: colError } = await supabase
+    .from('columns')
+    .select('id')
+    .eq('board_id', boardId);
+
+  if (colError) throw new Error(colError.message);
+  if (!columns?.length) return [];
+
   const { data, error } = await supabase
     .from('tasks')
-    .select('*, assignee:profiles!assignee_id(*)')
-    .in(
-      'column_id',
-      supabase.from('columns').select('id').eq('board_id', boardId)
-    )
+    .select('*')
+    .in('column_id', columns.map((c) => c.id))
     .order('position');
 
   if (error) throw new Error(error.message);

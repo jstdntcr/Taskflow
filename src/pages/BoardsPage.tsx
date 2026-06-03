@@ -1,11 +1,15 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../providers/AuthProvider';
+import { useProfile } from '../hooks/useProfile';
 import { BoardList } from '../components/board/BoardList';
 import styles from './BoardsPage.module.css';
 
 export function BoardsPage() {
   const { user, signOut } = useAuth();
+  const { data: profile } = useProfile();
   const navigate = useNavigate();
+
+  const initial = (profile?.name ?? user?.email ?? '?')[0].toUpperCase();
 
   const handleSignOut = async () => {
     await signOut();
@@ -19,9 +23,11 @@ export function BoardsPage() {
         <div className={styles.navRight}>
           <Link to="/profile" className={styles.profileLink}>
             <div className={styles.avatar}>
-              {user?.email?.[0].toUpperCase() ?? '?'}
+              {profile?.avatar_url
+                ? <img src={profile.avatar_url} alt="" className={styles.avatarImg} />
+                : initial}
             </div>
-            <span className={styles.email}>{user?.email}</span>
+            <span className={styles.email}>{profile?.name ?? user?.email}</span>
           </Link>
           <button className={styles.signOutBtn} onClick={handleSignOut}>
             Выйти

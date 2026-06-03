@@ -1,0 +1,143 @@
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.heading {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #374151;
+}
+
+.spinnerWrap {
+  display: flex;
+  justify-content: center;
+  padding: 16px;
+}
+
+.empty {
+  font-size: 0.875rem;
+  color: #9ca3af;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+/* CommentItem */
+.item {
+  display: flex;
+  gap: 10px;
+}
+
+.avatar {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: #3b82f6;
+  color: #fff;
+  font-size: 0.8rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-top: 1px;
+  overflow: hidden;
+}
+
+.avatarImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.content {
+  flex: 1;
+  min-width: 0;
+}
+
+.meta {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin-bottom: 4px;
+  flex-wrap: wrap;
+}
+
+.author {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: #374151;
+}
+
+.time {
+  font-size: 0.75rem;
+  color: #9ca3af;
+}
+
+.deleteBtn {
+  background: none;
+  border: none;
+  font-size: 0.75rem;
+  color: #9ca3af;
+  padding: 0;
+  cursor: pointer;
+  margin-left: auto;
+  transition: color 0.15s;
+}
+
+.deleteBtn:hover {
+  color: #ef4444;
+}
+
+.text {
+  font-size: 0.875rem;
+  color: #374151;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+/* CommentList form */
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.textarea {
+  padding: 8px 10px;
+  border: 1.5px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  font-family: inherit;
+  resize: vertical;
+  outline: none;
+  transition: border-color 0.15s;
+  line-height: 1.4;
+}
+
+.textarea:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.submitBtn {
+  align-self: flex-end;
+  padding: 7px 16px;
+  background: #3b82f6;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  transition: background 0.15s;
+}
+
+.submitBtn:hover:not(:disabled) { background: #2563eb; }
+.submitBtn:disabled { opacity: 0.6; cursor: not-allowed; }

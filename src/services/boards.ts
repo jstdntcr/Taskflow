@@ -12,7 +12,6 @@ export async function getBoards(): Promise<Board[]> {
 }
 
 export async function createBoard(title: string): Promise<Board> {
-  // Single atomic RPC: creates board + owner member + default columns
   const { data: boardId, error: rpcError } = await supabase
     .rpc('create_board_with_defaults', { p_title: title });
 
@@ -34,13 +33,25 @@ export async function deleteBoard(id: string): Promise<void> {
 }
 
 export async function getBoardMembers(boardId: string): Promise<BoardMember[]> {
-  const { data, error } = await supabase
+  const { data: members, error } = await supabase
     .from('board_members')
-    .select('*, profile:profiles(*)')
+    .select('*')
     .eq('board_id', boardId);
 
   if (error) throw new Error(error.message);
-  return data;
+  if (!members?.length) return [];
+
+  // board_members.user_id → auth.users (not profiles), so join separately
+  const { data: profiles, error: profilesError } = await supabase
+    .from('profiles')
+    .select('*')
+    .in('id', members.map((m) => m.user_id));
+
+  if (profilesError) throw new Error(profilesError.message);
+
+  const profileMap = Object.fromEntries((profiles ?? []).map((p) => [p.id, p]));
+
+  return members.map((m) => ({ ...m, profile: profileMap[m.user_id] ?? null }));
 }
 
 export async function inviteMember(boardId: string, email: string): Promise<void> {

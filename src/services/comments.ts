@@ -2,14 +2,27 @@ import { supabase } from './supabase';
 import type { Comment } from '../types';
 
 export async function getComments(taskId: string): Promise<Comment[]> {
-  const { data, error } = await supabase
+  const { data: comments, error } = await supabase
     .from('comments')
-    .select('*, profile:profiles!user_id(*)')
+    .select('*')
     .eq('task_id', taskId)
     .order('created_at');
 
   if (error) throw new Error(error.message);
-  return data;
+  if (!comments?.length) return [];
+
+  // comments.user_id → auth.users (not profiles), so join separately
+  const userIds = [...new Set(comments.map((c) => c.user_id))];
+  const { data: profiles, error: profilesError } = await supabase
+    .from('profiles')
+    .select('*')
+    .in('id', userIds);
+
+  if (profilesError) throw new Error(profilesError.message);
+
+  const profileMap = Object.fromEntries((profiles ?? []).map((p) => [p.id, p]));
+
+  return comments.map((c) => ({ ...c, profile: profileMap[c.user_id] ?? null }));
 }
 
 export async function createComment(taskId: string, content: string): Promise<Comment> {
@@ -19,11 +32,19 @@ export async function createComment(taskId: string, content: string): Promise<Co
   const { data, error } = await supabase
     .from('comments')
     .insert({ task_id: taskId, user_id: user.id, content })
-    .select('*, profile:profiles!user_id(*)')
+    .select()
     .single();
 
   if (error) throw new Error(error.message);
-  return data;
+
+  // Fetch profile separately
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('*')
+    .eq('id', user.id)
+    .single();
+
+  return { ...data, profile: profile ?? null };
 }
 
 export async function deleteComment(id: string): Promise<void> {
