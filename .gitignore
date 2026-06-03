@@ -11,6 +11,11 @@ node_modules
 dist
 dist-ssr
 *.local
+
+# Environment variables — never commit real keys
+.env
+.env.*
+!.env.example
 /.idea
 
 # Editor directories and files
