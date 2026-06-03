@@ -1,0 +1,166 @@
+.column {
+  width: 280px;
+  flex-shrink: 0;
+  background: #f3f4f6;
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  max-height: calc(100vh - 140px);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 12px 8px;
+  gap: 8px;
+}
+
+.title {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #374151;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex: 1;
+  cursor: default;
+}
+
+.count {
+  background: #e5e7eb;
+  color: #6b7280;
+  font-size: 0.75rem;
+  font-weight: 500;
+  padding: 1px 7px;
+  border-radius: 999px;
+}
+
+.renameInput {
+  flex: 1;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #374151;
+  border: 1.5px solid #3b82f6;
+  border-radius: 4px;
+  padding: 3px 7px;
+  outline: none;
+  background: #fff;
+}
+
+.deleteBtn {
+  background: none;
+  border: none;
+  color: #9ca3af;
+  padding: 4px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  opacity: 0;
+  transition: opacity 0.15s, color 0.15s;
+  flex-shrink: 0;
+}
+
+.column:hover .deleteBtn {
+  opacity: 1;
+}
+
+.deleteBtn:hover {
+  color: #ef4444;
+  background: #fee2e2;
+}
+
+.taskList {
+  padding: 0 8px;
+  overflow-y: auto;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-height: 60px;
+  border-radius: 6px;
+  transition: background 0.15s;
+}
+
+.taskList.over {
+  background: rgba(59, 130, 246, 0.06);
+  outline: 2px dashed #93c5fd;
+  outline-offset: -2px;
+}
+
+.emptyHint {
+  font-size: 0.8rem;
+  color: #d1d5db;
+  text-align: center;
+  padding: 16px 0;
+}
+
+.footer {
+  padding: 8px;
+  flex-shrink: 0;
+}
+
+.addTaskBtn {
+  width: 100%;
+  background: none;
+  border: none;
+  color: #6b7280;
+  font-size: 0.875rem;
+  text-align: left;
+  padding: 8px;
+  border-radius: 6px;
+  transition: background 0.15s, color 0.15s;
+}
+
+.addTaskBtn:hover {
+  background: #e5e7eb;
+  color: #111827;
+}
+
+.addForm {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.taskInput {
+  width: 100%;
+  padding: 8px;
+  border: 1.5px solid #3b82f6;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  resize: none;
+  outline: none;
+  font-family: inherit;
+  box-sizing: border-box;
+  background: #fff;
+}
+
+.addActions {
+  display: flex;
+  gap: 6px;
+}
+
+.saveBtn {
+  padding: 6px 14px;
+  background: #3b82f6;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  font-size: 0.8125rem;
+  font-weight: 500;
+}
+
+.saveBtn:hover:not(:disabled) { background: #2563eb; }
+.saveBtn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+.cancelBtn {
+  padding: 6px 10px;
+  background: none;
+  border: 1px solid #d1d5db;
+  border-radius: 5px;
+  font-size: 0.8125rem;
+  color: #6b7280;
+}
+
+.cancelBtn:hover { background: #f9fafb; }

@@ -1,0 +1,106 @@
+.container {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  overflow-x: auto;
+  padding-bottom: 16px;
+  /* prevent drag scroll issues */
+  -webkit-overflow-scrolling: touch;
+}
+
+.container::-webkit-scrollbar {
+  height: 6px;
+}
+.container::-webkit-scrollbar-track {
+  background: transparent;
+}
+.container::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: 3px;
+}
+
+.skeleton {
+  width: 280px;
+  height: 320px;
+  border-radius: 10px;
+  flex-shrink: 0;
+  background: linear-gradient(90deg, #f3f4f6 25%, #e5e7eb 50%, #f3f4f6 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s infinite;
+}
+
+@keyframes shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* Add column area */
+.addColumnArea {
+  flex-shrink: 0;
+  width: 280px;
+}
+
+.addColumnBtn {
+  width: 100%;
+  padding: 10px 14px;
+  background: rgba(0, 0, 0, 0.05);
+  border: 2px dashed #d1d5db;
+  border-radius: 10px;
+  color: #6b7280;
+  font-size: 0.875rem;
+  text-align: left;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+
+.addColumnBtn:hover {
+  background: rgba(59, 130, 246, 0.05);
+  border-color: #93c5fd;
+  color: #3b82f6;
+}
+
+.addForm {
+  background: #f3f4f6;
+  border-radius: 10px;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.addInput {
+  padding: 8px 10px;
+  border: 1.5px solid #3b82f6;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  outline: none;
+  background: #fff;
+}
+
+.addActions {
+  display: flex;
+  gap: 6px;
+}
+
+.saveBtn {
+  padding: 6px 14px;
+  background: #3b82f6;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  font-size: 0.8125rem;
+  font-weight: 500;
+}
+
+.saveBtn:hover:not(:disabled) { background: #2563eb; }
+.saveBtn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+.cancelBtn {
+  padding: 6px 10px;
+  background: none;
+  border: 1px solid #d1d5db;
+  border-radius: 5px;
+  font-size: 0.8125rem;
+  color: #6b7280;
+}
+
+.cancelBtn:hover { background: #e5e7eb; }
