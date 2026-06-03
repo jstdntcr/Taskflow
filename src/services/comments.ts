@@ -8,7 +8,7 @@ export async function getComments(taskId: string): Promise<Comment[]> {
     .eq('task_id', taskId)
     .order('created_at');
 
-  if (error) throw error;
+  if (error) throw new Error(error.message);
   return data;
 }
 
@@ -22,11 +22,11 @@ export async function createComment(taskId: string, content: string): Promise<Co
     .select('*, profile:profiles!user_id(*)')
     .single();
 
-  if (error) throw error;
+  if (error) throw new Error(error.message);
   return data;
 }
 
 export async function deleteComment(id: string): Promise<void> {
   const { error } = await supabase.from('comments').delete().eq('id', id);
-  if (error) throw error;
+  if (error) throw new Error(error.message);
 }

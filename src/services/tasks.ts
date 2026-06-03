@@ -11,7 +11,7 @@ export async function getTasks(boardId: string): Promise<Task[]> {
     )
     .order('position');
 
-  if (error) throw error;
+  if (error) throw new Error(error.message);
   return data;
 }
 
@@ -29,13 +29,13 @@ export async function createTask(
     .select()
     .single();
 
-  if (error) throw error;
+  if (error) throw new Error(error.message);
   return data;
 }
 
 export async function updateTask(id: string, updates: Partial<Task>): Promise<void> {
   const { error } = await supabase.from('tasks').update(updates).eq('id', id);
-  if (error) throw error;
+  if (error) throw new Error(error.message);
 }
 
 export async function moveTask(
@@ -47,10 +47,10 @@ export async function moveTask(
     .from('tasks')
     .update({ column_id: columnId, position })
     .eq('id', id);
-  if (error) throw error;
+  if (error) throw new Error(error.message);
 }
 
 export async function deleteTask(id: string): Promise<void> {
   const { error } = await supabase.from('tasks').delete().eq('id', id);
-  if (error) throw error;
+  if (error) throw new Error(error.message);
 }

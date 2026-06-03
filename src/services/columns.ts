@@ -10,7 +10,7 @@ export async function getColumns(boardId: string): Promise<Column[]> {
     .eq('board_id', boardId)
     .order('position');
 
-  if (error) throw error;
+  if (error) throw new Error(error.message);
   return data;
 }
 
@@ -22,7 +22,7 @@ export async function createDefaultColumns(boardId: string): Promise<void> {
   }));
 
   const { error } = await supabase.from('columns').insert(columns);
-  if (error) throw error;
+  if (error) throw new Error(error.message);
 }
 
 export async function createColumn(boardId: string, title: string, position: number): Promise<Column> {
@@ -32,16 +32,16 @@ export async function createColumn(boardId: string, title: string, position: num
     .select()
     .single();
 
-  if (error) throw error;
+  if (error) throw new Error(error.message);
   return data;
 }
 
 export async function updateColumn(id: string, title: string): Promise<void> {
   const { error } = await supabase.from('columns').update({ title }).eq('id', id);
-  if (error) throw error;
+  if (error) throw new Error(error.message);
 }
 
 export async function deleteColumn(id: string): Promise<void> {
   const { error } = await supabase.from('columns').delete().eq('id', id);
-  if (error) throw error;
+  if (error) throw new Error(error.message);
 }

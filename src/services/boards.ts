@@ -7,27 +7,30 @@ export async function getBoards(): Promise<Board[]> {
     .select('*')
     .order('created_at', { ascending: false });
 
-  if (error) throw error;
+  if (error) throw new Error(error.message);
   return data;
 }
 
 export async function createBoard(title: string): Promise<Board> {
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) throw new Error('Not authenticated');
+  // Single atomic RPC: creates board + owner member + default columns
+  const { data: boardId, error: rpcError } = await supabase
+    .rpc('create_board_with_defaults', { p_title: title });
+
+  if (rpcError) throw new Error(rpcError.message);
 
   const { data, error } = await supabase
     .from('boards')
-    .insert({ title, owner_id: user.id })
-    .select()
+    .select('*')
+    .eq('id', boardId)
     .single();
 
-  if (error) throw error;
+  if (error) throw new Error(error.message);
   return data;
 }
 
 export async function deleteBoard(id: string): Promise<void> {
   const { error } = await supabase.from('boards').delete().eq('id', id);
-  if (error) throw error;
+  if (error) throw new Error(error.message);
 }
 
 export async function getBoardMembers(boardId: string): Promise<BoardMember[]> {
@@ -36,7 +39,7 @@ export async function getBoardMembers(boardId: string): Promise<BoardMember[]> {
     .select('*, profile:profiles(*)')
     .eq('board_id', boardId);
 
-  if (error) throw error;
+  if (error) throw new Error(error.message);
   return data;
 }
 
