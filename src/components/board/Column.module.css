@@ -1,4 +1,5 @@
 .column {
+  position: relative;
   width: 280px;
   flex-shrink: 0;
   background: #f3f4f6;
@@ -8,12 +9,40 @@
   max-height: calc(100vh - 140px);
 }
 
+/* Horizontal insertion line for tasks */
+.taskLine {
+  height: 4px;
+  background: #3b82f6;
+  border-radius: 2px;
+  margin: 1px 0;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+}
+
 .header {
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 12px 12px 8px;
-  gap: 8px;
+  gap: 6px;
+}
+
+.dragHandle {
+  color: #d1d5db;
+  cursor: grab;
+  display: flex;
+  align-items: center;
+  padding: 2px;
+  border-radius: 3px;
+  flex-shrink: 0;
+  transition: color 0.15s;
+}
+
+.dragHandle:hover {
+  color: #9ca3af;
+}
+
+.dragHandle:active {
+  cursor: grabbing;
 }
 
 .title {
@@ -79,13 +108,6 @@
   gap: 6px;
   min-height: 60px;
   border-radius: 6px;
-  transition: background 0.15s;
-}
-
-.taskList.over {
-  background: rgba(59, 130, 246, 0.06);
-  outline: 2px dashed #93c5fd;
-  outline-offset: -2px;
 }
 
 .emptyHint {

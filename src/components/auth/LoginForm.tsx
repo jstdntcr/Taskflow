@@ -3,6 +3,8 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../providers/AuthProvider';
 import styles from './auth.module.css';
 
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
 export function LoginForm() {
   const { signIn } = useAuth();
   const navigate = useNavigate();
@@ -12,8 +14,18 @@ export function LoginForm() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
+  const validate = (): string | null => {
+    if (!email.trim()) return 'Введите email';
+    if (!EMAIL_RE.test(email)) return 'Введите корректный email';
+    if (!password) return 'Введите пароль';
+    return null;
+  };
+
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
+    const validationError = validate();
+    if (validationError) { setError(validationError); return; }
+
     setError(null);
     setLoading(true);
     try {
@@ -39,8 +51,7 @@ export function LoginForm() {
               id="email"
               type="email"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
+              onChange={(e) => { setEmail(e.target.value); setError(null); }}
               autoFocus
               autoComplete="email"
               className={styles.input}
@@ -54,15 +65,14 @@ export function LoginForm() {
               id="password"
               type="password"
               value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
+              onChange={(e) => { setPassword(e.target.value); setError(null); }}
               autoComplete="current-password"
               className={styles.input}
               placeholder="••••••••"
             />
           </div>
 
-          {error && <p className={styles.error}>{error}</p>}
+          {error && <p role="alert" className={styles.error}>{error}</p>}
 
           <button type="submit" disabled={loading} className={styles.submit}>
             {loading ? 'Входим...' : 'Войти'}

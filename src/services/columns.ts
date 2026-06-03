@@ -45,3 +45,17 @@ export async function deleteColumn(id: string): Promise<void> {
   const { error } = await supabase.from('columns').delete().eq('id', id);
   if (error) throw new Error(error.message);
 }
+
+export async function reorderColumns(
+  updates: { id: string; position: number }[]
+): Promise<void> {
+  await Promise.all(
+    updates.map(({ id, position }) =>
+      supabase
+        .from('columns')
+        .update({ position })
+        .eq('id', id)
+        .then(({ error }) => { if (error) throw new Error(error.message); })
+    )
+  );
+}

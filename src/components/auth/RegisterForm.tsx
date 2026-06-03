@@ -3,6 +3,8 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '../../providers/AuthProvider';
 import styles from './auth.module.css';
 
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
 export function RegisterForm() {
   const { signUp } = useAuth();
 
@@ -13,19 +15,20 @@ export function RegisterForm() {
   const [loading, setLoading] = useState(false);
   const [done, setDone] = useState(false);
 
+  const validate = (): string | null => {
+    if (!email.trim()) return 'Введите email';
+    if (!EMAIL_RE.test(email)) return 'Введите корректный email';
+    if (password.length < 6) return 'Пароль должен содержать не менее 6 символов';
+    if (password !== confirm) return 'Пароли не совпадают';
+    return null;
+  };
+
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
+    const validationError = validate();
+    if (validationError) { setError(validationError); return; }
+
     setError(null);
-
-    if (password.length < 6) {
-      setError('Пароль должен содержать не менее 6 символов');
-      return;
-    }
-    if (password !== confirm) {
-      setError('Пароли не совпадают');
-      return;
-    }
-
     setLoading(true);
     try {
       await signUp(email, password);
@@ -69,8 +72,7 @@ export function RegisterForm() {
               id="email"
               type="email"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
+              onChange={(e) => { setEmail(e.target.value); setError(null); }}
               autoFocus
               autoComplete="email"
               className={styles.input}
@@ -84,8 +86,7 @@ export function RegisterForm() {
               id="password"
               type="password"
               value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
+              onChange={(e) => { setPassword(e.target.value); setError(null); }}
               autoComplete="new-password"
               className={styles.input}
               placeholder="не менее 6 символов"
@@ -98,15 +99,14 @@ export function RegisterForm() {
               id="confirm"
               type="password"
               value={confirm}
-              onChange={(e) => setConfirm(e.target.value)}
-              required
+              onChange={(e) => { setConfirm(e.target.value); setError(null); }}
               autoComplete="new-password"
               className={styles.input}
               placeholder="••••••••"
             />
           </div>
 
-          {error && <p className={styles.error}>{error}</p>}
+          {error && <p role="alert" className={styles.error}>{error}</p>}
 
           <button type="submit" disabled={loading} className={styles.submit}>
             {loading ? 'Создаём аккаунт...' : 'Зарегистрироваться'}

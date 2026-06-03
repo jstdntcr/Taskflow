@@ -1,5 +1,6 @@
-import { useState, type FormEvent, type KeyboardEvent } from 'react';
-import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
+import { Fragment, useState, type FormEvent, type KeyboardEvent } from 'react';
+import { SortableContext, verticalListSortingStrategy, useSortable } from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 import { useDroppable } from '@dnd-kit/core';
 import type { Column as ColumnType, Task } from '../../types';
 import { useUpdateColumn, useDeleteColumn } from '../../hooks/useColumns';
@@ -7,15 +8,48 @@ import { useCreateTask } from '../../hooks/useTasks';
 import { TaskCard } from './TaskCard';
 import styles from './Column.module.css';
 
+// Prefix so task drop zones don't collide with column sortable IDs
+export const TASK_DROP_PREFIX = 'drop-';
+
 interface Props {
   column: ColumnType;
   tasks: Task[];
   boardId: string;
   onTaskClick?: (task: Task) => void;
+  /** Index in the task list where the task insertion line should appear */
+  taskLineIndex?: number | null;
 }
 
-export function Column({ column, tasks, boardId, onTaskClick }: Props) {
-  const { setNodeRef, isOver } = useDroppable({ id: column.id });
+export function Column({
+  column,
+  tasks,
+  boardId,
+  onTaskClick,
+  taskLineIndex = null,
+}: Props) {
+  const {
+    setNodeRef: setColumnRef,
+    setActivatorNodeRef,
+    attributes,
+    listeners,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({
+    id: column.id,
+    data: { type: 'column', columnId: column.id },
+  });
+
+  const { setNodeRef: setTaskListRef } = useDroppable({
+    id: TASK_DROP_PREFIX + column.id,
+    data: { type: 'column-dropzone', columnId: column.id },
+  });
+
+  const columnStyle = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.4 : 1,
+  };
 
   const updateColumn = useUpdateColumn(boardId);
   const deleteColumn = useDeleteColumn(boardId);
@@ -70,8 +104,22 @@ export function Column({ column, tasks, boardId, onTaskClick }: Props) {
   };
 
   return (
-    <div className={styles.column}>
+    <div ref={setColumnRef} style={columnStyle} className={styles.column}>
       <div className={styles.header}>
+        <div
+          ref={setActivatorNodeRef}
+          {...attributes}
+          {...listeners}
+          className={styles.dragHandle}
+          title="Перетащить колонку"
+        >
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+            <circle cx="9" cy="5"  r="1.5"/><circle cx="15" cy="5"  r="1.5"/>
+            <circle cx="9" cy="12" r="1.5"/><circle cx="15" cy="12" r="1.5"/>
+            <circle cx="9" cy="19" r="1.5"/><circle cx="15" cy="19" r="1.5"/>
+          </svg>
+        </div>
+
         {renaming ? (
           <input
             autoFocus
@@ -82,11 +130,16 @@ export function Column({ column, tasks, boardId, onTaskClick }: Props) {
             className={styles.renameInput}
           />
         ) : (
-          <h3 className={styles.title} onDoubleClick={() => setRenaming(true)} title="Двойной клик для переименования">
+          <h3
+            className={styles.title}
+            onDoubleClick={() => setRenaming(true)}
+            title="Двойной клик для переименования"
+          >
             {column.title}
             <span className={styles.count}>{tasks.length}</span>
           </h3>
         )}
+
         <button className={styles.deleteBtn} onClick={handleDelete} aria-label="Удалить колонку">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
             <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
@@ -95,11 +148,15 @@ export function Column({ column, tasks, boardId, onTaskClick }: Props) {
       </div>
 
       <SortableContext items={sorted.map((t) => t.id)} strategy={verticalListSortingStrategy}>
-        <div ref={setNodeRef} className={`${styles.taskList} ${isOver ? styles.over : ''}`}>
-          {sorted.map((task) => (
-            <TaskCard key={task.id} task={task} onClick={onTaskClick} />
+        <div ref={setTaskListRef} className={styles.taskList}>
+          {sorted.map((task, i) => (
+            <Fragment key={task.id}>
+              {taskLineIndex === i && <div className={styles.taskLine} />}
+              <TaskCard task={task} onClick={onTaskClick} />
+            </Fragment>
           ))}
-          {sorted.length === 0 && (
+          {taskLineIndex === sorted.length && <div className={styles.taskLine} />}
+          {sorted.length === 0 && taskLineIndex === null && (
             <div className={styles.emptyHint}>Перетащите задачу сюда</div>
           )}
         </div>

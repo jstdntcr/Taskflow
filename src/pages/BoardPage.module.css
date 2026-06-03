@@ -133,6 +133,32 @@
   white-space: nowrap;
 }
 
+.boardNameEditable {
+  cursor: text;
+  border-radius: 4px;
+  padding: 2px 4px;
+  margin: -2px -4px;
+  transition: background 0.15s;
+}
+
+.boardNameEditable:hover {
+  background: #f3f4f6;
+}
+
+.boardNameInput {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: #111827;
+  border: 1.5px solid #3b82f6;
+  border-radius: 6px;
+  padding: 3px 8px;
+  outline: none;
+  min-width: 120px;
+  max-width: 300px;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  background: #fff;
+}
+
 .main {
   padding: 20px;
   flex: 1;

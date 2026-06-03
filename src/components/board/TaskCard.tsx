@@ -24,7 +24,10 @@ interface Props {
 
 export function TaskCard({ task, onClick, overlay = false }: Props) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } =
-    useSortable({ id: task.id });
+    useSortable({
+      id: task.id,
+      data: { type: 'task', columnId: task.column_id },
+    });
 
   const style = {
     transform: CSS.Transform.toString(transform),

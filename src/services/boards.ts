@@ -27,6 +27,11 @@ export async function createBoard(title: string): Promise<Board> {
   return data;
 }
 
+export async function updateBoard(id: string, title: string): Promise<void> {
+  const { error } = await supabase.from('boards').update({ title }).eq('id', id);
+  if (error) throw new Error(error.message);
+}
+
 export async function deleteBoard(id: string): Promise<void> {
   const { error } = await supabase.from('boards').delete().eq('id', id);
   if (error) throw new Error(error.message);

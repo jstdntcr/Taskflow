@@ -104,3 +104,37 @@
 }
 
 .cancelBtn:hover { background: #e5e7eb; }
+
+/* Column drag overlay */
+.columnOverlay {
+  width: 280px;
+  background: #fff;
+  border: 1.5px solid #3b82f6;
+  border-radius: 10px;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.18);
+  padding: 14px 16px;
+  rotate: 2deg;
+  opacity: 0.95;
+}
+
+.columnOverlayHeader {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.columnOverlayTitle {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #374151;
+  flex: 1;
+}
+
+.columnOverlayCount {
+  background: #e5e7eb;
+  color: #6b7280;
+  font-size: 0.75rem;
+  font-weight: 500;
+  padding: 1px 7px;
+  border-radius: 999px;
+}

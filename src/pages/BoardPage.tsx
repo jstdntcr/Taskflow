@@ -1,6 +1,6 @@
-import { useState } from 'react';
+import { useState, useRef, type KeyboardEvent } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { useBoard } from '../hooks/useBoards';
+import { useBoard, useUpdateBoard } from '../hooks/useBoards';
 import { useAuth } from '../providers/AuthProvider';
 import { useProfile } from '../hooks/useProfile';
 import { ColumnList } from '../components/board/ColumnList';
@@ -15,9 +15,35 @@ export function BoardPage() {
   const { data: board, isLoading } = useBoard(boardId!);
   const { user, signOut } = useAuth();
   const { data: profile } = useProfile();
+  const updateBoard = useUpdateBoard();
+
   const initial = (profile?.name ?? user?.email ?? '?')[0].toUpperCase();
+  const isOwner = board?.owner_id === user?.id;
 
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
+  const [renamingBoard, setRenamingBoard] = useState(false);
+  const [boardNameValue, setBoardNameValue] = useState('');
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  const startRename = () => {
+    if (!isOwner || !board) return;
+    setBoardNameValue(board.title);
+    setRenamingBoard(true);
+    setTimeout(() => inputRef.current?.select(), 0);
+  };
+
+  const commitRename = () => {
+    const trimmed = boardNameValue.trim();
+    if (trimmed && trimmed !== board?.title) {
+      updateBoard.mutate({ id: boardId!, title: trimmed });
+    }
+    setRenamingBoard(false);
+  };
+
+  const onRenameKey = (e: KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') commitRename();
+    if (e.key === 'Escape') setRenamingBoard(false);
+  };
 
   const handleSignOut = async () => {
     await signOut();
@@ -34,10 +60,30 @@ export function BoardPage() {
             </svg>
           </button>
           <Link to="/" className={styles.logoLink}>TaskFlow</Link>
+
           {board && (
             <>
               <span className={styles.separator}>/</span>
-              <span className={styles.boardName}>{board.title}</span>
+              {renamingBoard ? (
+                <input
+                  ref={inputRef}
+                  value={boardNameValue}
+                  onChange={(e) => setBoardNameValue(e.target.value)}
+                  onBlur={commitRename}
+                  onKeyDown={onRenameKey}
+                  className={styles.boardNameInput}
+                  autoFocus
+                  maxLength={100}
+                />
+              ) : (
+                <span
+                  className={`${styles.boardName} ${isOwner ? styles.boardNameEditable : ''}`}
+                  onDoubleClick={startRename}
+                  title={isOwner ? 'Двойной клик для переименования' : undefined}
+                >
+                  {board.title}
+                </span>
+              )}
             </>
           )}
           {isLoading && <Spinner size="sm" />}

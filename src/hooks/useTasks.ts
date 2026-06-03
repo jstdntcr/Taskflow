@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { createTask, deleteTask, getTasks, moveTask, updateTask } from '../services/tasks';
+import { createTask, deleteTask, getTasks, moveTask, reorderTasks, updateTask } from '../services/tasks';
 import type { Task } from '../types';
 
 export function useTasks(boardId: string) {
@@ -42,5 +42,29 @@ export function useDeleteTask(boardId: string) {
   return useMutation({
     mutationFn: deleteTask,
     onSuccess: () => qc.invalidateQueries({ queryKey: ['tasks', boardId] }),
+  });
+}
+
+export function useReorderTasks(boardId: string) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: reorderTasks,
+    // Apply new column_id/position locally before the server responds
+    onMutate: async (updates) => {
+      await qc.cancelQueries({ queryKey: ['tasks', boardId] });
+      const prev = qc.getQueryData<Task[]>(['tasks', boardId]);
+      const map = new Map(updates.map((u) => [u.id, u]));
+      qc.setQueryData<Task[]>(['tasks', boardId], (old = []) =>
+        old.map((t) => {
+          const u = map.get(t.id);
+          return u ? { ...t, column_id: u.column_id, position: u.position } : t;
+        })
+      );
+      return { prev };
+    },
+    onError: (_err, _vars, ctx) => {
+      if (ctx?.prev) qc.setQueryData(['tasks', boardId], ctx.prev);
+    },
+    onSettled: () => qc.invalidateQueries({ queryKey: ['tasks', boardId] }),
   });
 }

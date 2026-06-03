@@ -59,3 +59,17 @@ export async function deleteTask(id: string): Promise<void> {
   const { error } = await supabase.from('tasks').delete().eq('id', id);
   if (error) throw new Error(error.message);
 }
+
+export async function reorderTasks(
+  updates: { id: string; column_id: string; position: number }[]
+): Promise<void> {
+  await Promise.all(
+    updates.map(({ id, column_id, position }) =>
+      supabase
+        .from('tasks')
+        .update({ column_id, position })
+        .eq('id', id)
+        .then(({ error }) => { if (error) throw new Error(error.message); })
+    )
+  );
+}
